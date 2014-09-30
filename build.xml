@@ -1,0 +1,35 @@
+<project name="GRIN" default="main">
+	<loadresource property="zip.contents">
+		<file file="lib/zip"/>
+	</loadresource>
+	<loadresource property="json.contents">
+		<file file="lib/json"/>
+	</loadresource>
+	<loadresource property="base64.contents">
+		<file file="lib/base64"/>
+	</loadresource>
+	<loadresource property="argparse.contents">
+		<file file="lib/argparse"/>
+	</loadresource>
+
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+
+	<target name="create_installer">
+		<copy file="installer.lua" tofile="build/installer.lua" overwrite="true">
+            <filterchain>
+            	<replacetokens>
+            		<token key="ZIP" value="${zip.contents}"/>
+            		<token key="JSON" value="${json.contents}"/>
+            		<token key="BASE64" value="${base64.contents}"/>
+            		<token key="ARGPARSE" value="${argparse.contents}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+	</target>
+
+	<target name="main" depends="create_installer">
+		
+	</target>
+</project>
