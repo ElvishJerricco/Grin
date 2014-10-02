@@ -6,66 +6,66 @@ local base64 = setmetatable({}, {__index=getfenv()})
 local argparse = setmetatable({}, {__index=getfenv()})
 
 do
-	local function zip_api_make()
-		@ZIP@
-	end
-	setfenv(zip_api_make, zip)
-	zip_api_make()
+    local function zip_api_make()
+        @ZIP@
+    end
+    setfenv(zip_api_make, zip)
+    zip_api_make()
 
-	local function json_api_make()
-		@JSON@
-	end
-	setfenv(json_api_make, json)
-	json_api_make()
+    local function json_api_make()
+        @JSON@
+    end
+    setfenv(json_api_make, json)
+    json_api_make()
 
-	local function base64_api_make()
-		@BASE64@
-	end
-	setfenv(base64_api_make, base64)
-	base64_api_make()
+    local function base64_api_make()
+        @BASE64@
+    end
+    setfenv(base64_api_make, base64)
+    base64_api_make()
 
-	local function argparse_api_make()
-		@ARGPARSE@
-	end
-	setfenv(argparse_api_make, argparse)
-	argparse_api_make()
+    local function argparse_api_make()
+        @ARGPARSE@
+    end
+    setfenv(argparse_api_make, argparse)
+    argparse_api_make()
 end
 
 local oldTime = os.time()
 local function sleepCheckin()
-	local newTime = os.time()
-	if newTime - oldTime >= (0.020 * 1.5) then
-		oldTime = newTime
-		sleep(0)
-	end
+    local newTime = os.time()
+    if newTime - oldTime >= (0.020 * 1.5) then
+        oldTime = newTime
+        sleep(0)
+    end
 end
 
 local function combine(path, ...)
-	if not path then
-		return ""
-	end
-	return fs.combine(path, combine(...))
+    if not path then
+        return ""
+    end
+    return fs.combine(path, combine(...))
 end
 
 -- Arguments
 
 local parser = argparse.new()
 parser
-	:parameter"user"
-	:shortcut"u"
+    :parameter"user"
+    :shortcut"u"
 parser
-	:parameter"repo"
-	:shortcut"r"
+    :parameter"repo"
+    :shortcut"r"
 parser
-	:parameter"tag"
-	:shortcut"t"
+    :parameter"tag"
+    :shortcut"t"
 parser
-	:argument"dir"
+    :argument"dir"
 parser
-	:usage"Usage: grin -user <user> -repo <repo> [-tag tag_name] <dir>"
+    :usage"Usage: grin -user <user> -repo <repo> [-tag tag_name] <dir>"
 local options = parser:parse({}, ...)
 if not options or not options.user or not options.repo or not options.dir then
-	parser:printUsage()
+    parser:printUsage()
     return
 end
 
@@ -81,15 +81,15 @@ assert(type(githubApiJSON) == "table", "Malformed response")
 
 local release
 if options.tag then
-	for i,v in ipairs(githubApiJSON) do
-		if v.tag_name == options.tag then
-			release = v
-			break
-		end
-	end
-	assert(release, "Release " .. options.tag .. " not found")
+    for i,v in ipairs(githubApiJSON) do
+        if v.tag_name == options.tag then
+            release = v
+            break
+        end
+    end
+    assert(release, "Release " .. options.tag .. " not found")
 else
-	release = assert(githubApiJSON[1], "Latest release not found")
+    release = assert(githubApiJSON[1], "Latest release not found")
 end
 
 local assetUrl = assert(release.assets and release.assets[1] and release.assets[1].url, "Malformed response")
@@ -107,29 +107,29 @@ sleep(0)
 
 local i = 0
 local zfs = zip.open({read=function()
-	sleepCheckin()
-	i = i + 1
-	return zipTbl[i]
+    sleepCheckin()
+    i = i + 1
+    return zipTbl[i]
 end})
 
 local function copyFilesFromDir(dir)
-	for i,v in ipairs(zfs.list(dir)) do
-		sleepCheckin()
-		local fullPath = fs.combine(dir, v)
-		if zfs.isDir(fullPath) then
-			copyFilesFromDir(fullPath)
-		else
-			print("Copying file: " .. fullPath)
-			local fh = fs.open(combine(shell.resolve(options.dir), fullPath), "wb")
-			local zfh = zfs.open(fullPath, "rb")
-			for b in zfh.read do
-				sleepCheckin()
-				fh.write(b)
-			end
-			fh.close()
-			zfh.close()
-		end
-	end
+    for i,v in ipairs(zfs.list(dir)) do
+        sleepCheckin()
+        local fullPath = fs.combine(dir, v)
+        if zfs.isDir(fullPath) then
+            copyFilesFromDir(fullPath)
+        else
+            print("Copying file: " .. fullPath)
+            local fh = fs.open(combine(shell.resolve(options.dir), fullPath), "wb")
+            local zfh = zfs.open(fullPath, "rb")
+            for b in zfh.read do
+                sleepCheckin()
+                fh.write(b)
+            end
+            fh.close()
+            zfh.close()
+        end
+    end
 end
 
 copyFilesFromDir("")

@@ -1,69 +1,69 @@
 <project name="GRIN" default="main">
-	<condition property="is_windows">
-	    <os family="windows"/>
-	</condition>
-	<condition property="is_unix">
-		<os family="unix" />
-	</condition>
+    <condition property="is_windows">
+        <os family="windows"/>
+    </condition>
+    <condition property="is_unix">
+        <os family="unix" />
+    </condition>
 
 
-	<loadresource property="zip.contents">
-		<file file="lib/zip"/>
-	</loadresource>
-	<loadresource property="json.contents">
-		<file file="lib/json"/>
-	</loadresource>
-	<loadresource property="base64.contents">
-		<file file="lib/base64"/>
-	</loadresource>
-	<loadresource property="argparse.contents">
-		<file file="lib/argparse"/>
-	</loadresource>
+    <loadresource property="zip.contents">
+        <file file="lib/zip"/>
+    </loadresource>
+    <loadresource property="json.contents">
+        <file file="lib/json"/>
+    </loadresource>
+    <loadresource property="base64.contents">
+        <file file="lib/base64"/>
+    </loadresource>
+    <loadresource property="argparse.contents">
+        <file file="lib/argparse"/>
+    </loadresource>
 
-	<target name="clean">
-		<delete dir="build" />
-	</target>
+    <target name="clean">
+        <delete dir="build" />
+    </target>
 
-	<target name="create_installer">
-		<copy file="installer.lua" tofile="build/installer.lua" overwrite="true">
+    <target name="create_installer">
+        <copy file="installer.lua" tofile="build/installer.lua" overwrite="true">
             <filterchain>
-            	<replacetokens>
-            		<token key="ZIP" value="${zip.contents}"/>
-            		<token key="JSON" value="${json.contents}"/>
-            		<token key="BASE64" value="${base64.contents}"/>
-            		<token key="ARGPARSE" value="${argparse.contents}"/>
+                <replacetokens>
+                    <token key="ZIP" value="${zip.contents}"/>
+                    <token key="JSON" value="${json.contents}"/>
+                    <token key="BASE64" value="${base64.contents}"/>
+                    <token key="ARGPARSE" value="${argparse.contents}"/>
                 </replacetokens>
             </filterchain>
         </copy>
-	</target>
+    </target>
 
-	<target name="make_archive" depends="create_installer">
-		<copy todir="build/grin/lib">
-			<fileset dir="lib" />
-		</copy>
-		<copy tofile="build/grin/bin/grin" file="build/installer.lua" />
+    <target name="make_archive" depends="create_installer">
+        <copy todir="build/grin/lib">
+            <fileset dir="lib" />
+        </copy>
+        <copy tofile="build/grin/bin/grin" file="build/installer.lua" />
 
-		<zip zip64Mode="never" destfile="build/grin.zip" basedir="build/grin" />
-	</target>
+        <zip zip64Mode="never" destfile="build/grin.zip" basedir="build/grin" />
+    </target>
 
-	<target name="if_windows" if="is_windows" depends="make_archive">
-		<exec executable="certutil">
-			<arg value="-encode" />
-			<arg value="build/grin.zip" />
-			<arg value="build/grin.zip.base64" />
-		</exec>
-	</target>
+    <target name="if_windows" if="is_windows" depends="make_archive">
+        <exec executable="certutil">
+            <arg value="-encode" />
+            <arg value="build/grin.zip" />
+            <arg value="build/grin.zip.base64" />
+        </exec>
+    </target>
 
-	<target name="if_unix" if="is_unix" depends="make_archive">
-		<exec executable="base64">
-			<arg value="-i" />
-			<arg value="build/grin.zip" />
-			<arg value="-o" />
-			<arg value="build/grin.zip.base64" />
-		</exec>
-	</target>
+    <target name="if_unix" if="is_unix" depends="make_archive">
+        <exec executable="base64">
+            <arg value="-i" />
+            <arg value="build/grin.zip" />
+            <arg value="-o" />
+            <arg value="build/grin.zip.base64" />
+        </exec>
+    </target>
 
-	<target name="main" depends="if_unix, if_windows">
-		
-	</target>
+    <target name="main" depends="if_unix, if_windows">
+        
+    </target>
 </project>
