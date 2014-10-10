@@ -64,13 +64,8 @@ parser
     :shortcut"e"
 parser
     :argument"dir"
-parser
-    :usage"Usage: grin -user <user> -repo <repo> [-tag tag_name] <dir>"
 local options = parser:parse({}, ...)
-if not options or not options.user or not options.repo or not options.dir then
-    parser:printUsage()
-    return
-end
+assert(options and options.user and options.repo and options.dir, "Usage: grin -user <user> -repo <repo> [-tag tag_name] <dir>")
 
 local print = print
 if options["emit-events"] then
