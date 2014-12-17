@@ -878,9 +878,9 @@ local function noCompression(t)
 
     local fOut
     if type(t.output) == "function" then
-        fOut = f.output
+        fOut = t.output
     elseif type(t.output) == "table" and t.output.write then
-        fOut = f.output.write
+        fOut = t.output.write
     end
 
     for c in fIn do
