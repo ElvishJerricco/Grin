@@ -1059,7 +1059,7 @@ function open(fileHandle)
         for i,v in ipairs(centralDirectoryHeaders) do
             local vpath = fs.combine(v.fileName, "")
             if path ~= vpath then
-                if vpath:sub(1, #path) == path and not fs.combine(vpath:sub(#path + 1), ""):find("/.") then
+                if fs.getDir(vpath) == path then
                     table.insert(list, fs.combine(vpath:sub(#path + 1), ""))
                 end
             end
