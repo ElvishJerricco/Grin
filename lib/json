@@ -136,7 +136,7 @@ function parseString(str)
 
 		s = s .. next
 	end
-	return s, removeWhite(str)
+	return s, removeWhite(str:sub(2))
 end
 
 function parseArray(str)
