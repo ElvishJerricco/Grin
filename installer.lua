@@ -106,7 +106,7 @@ local assetUrl = assert(release.assets and release.assets[1] and release.assets[
 print("Got JSON")
 local zipResponse = assert(http.get(assetUrl, {["Accept"]="application/octet-stream"}))
 assert(zipResponse.getResponseCode() == 200 or zipResponse.getResponseCode() == 302, "Failed zip response")
-local base64Str = zipResponse.readAll()
+local base64Str = zipResponse.readAll():gsub("\n", "")
 
 print("Decoding base64")
 sleep(0)
